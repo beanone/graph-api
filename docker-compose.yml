@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      target: builder  # Use builder stage for development
+    ports:
+      - "7000:8000"
+    volumes:
+      - ./src:/app/src  # Mount source code for development
+      - ./tests:/app/tests  # Mount tests for development
+    environment:
+      - ENVIRONMENT=development
+      - PYTHONPATH=/app
+    command: uvicorn src.graph_api.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # Production service
+  api-prod:
+    build:
+      context: .
+      target: ${TARGET:-builder}  # Use production stage by default
+    ports:
+      - "7000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - PYTHONPATH=/app
+    command: uvicorn src.graph_api.main:app --host 0.0.0.0 --port 8000 --workers 4
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    restart: unless-stopped
