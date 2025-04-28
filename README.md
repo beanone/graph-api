@@ -66,6 +66,121 @@ To stop the development container:
 docker-compose down
 ```
 
+### Docker Development
+
+The development container will automatically start with hot-reload enabled. The API will be available at `http://localhost:8000`.
+
+Development container features:
+- Hot-reload for code changes
+- Mounted source code and tests
+- Development environment configuration
+- Health checks
+- Automatic restart on failure
+
+### Docker Production
+
+To run the production container:
+
+```bash
+docker-compose up --build api-prod
+```
+
+Production container features:
+- Multi-stage build for smaller image size
+- Non-root user for security
+- Resource limits and reservations
+- Health checks
+- Multiple workers for better performance
+- Environment set to production
+- No volume mounts (code is built into the image)
+
+To stop the production container:
+```bash
+docker-compose down
+```
+
+Both development and production containers:
+- Expose port 8000
+- Have health checks configured
+- Use `restart: unless-stopped` policy
+- Set `PYTHONPATH=/app`
+
+### Docker Environment Variables
+
+The following environment variables can be set in the `docker-compose.yml` file or passed to the container:
+
+- `PYTHONPATH`: Set to `/app` by default
+- `ENVIRONMENT`: Set to `development` or `production`
+- `WORKERS`: Number of Uvicorn workers (default: 1 for development, 4 for production)
+- `HOST`: Host to bind to (default: 0.0.0.0)
+- `PORT`: Port to bind to (default: 8000)
+
+### Docker Health Checks
+
+The containers include health checks that verify:
+- The API is running and responding
+- The server is accepting connections
+- The application is healthy
+
+Health check endpoint: `http://localhost:8000/health`
+
+### Docker Logs
+
+To view container logs:
+```bash
+# Development container
+docker-compose logs -f api
+
+# Production container
+docker-compose logs -f api-prod
+```
+
+### Docker Cleanup
+
+To clean up Docker resources:
+```bash
+# Stop and remove containers
+docker-compose down
+
+# Remove all unused containers, networks, images
+docker system prune
+
+# Remove all unused volumes
+docker volume prune
+```
+
+### Docker Troubleshooting
+
+Common issues and solutions:
+
+1. Port already in use:
+```bash
+# Find process using port 8000
+lsof -i :8000
+# Kill the process
+kill -9 <PID>
+```
+
+2. Container not starting:
+```bash
+# Check container logs
+docker-compose logs api
+# Check container status
+docker-compose ps
+```
+
+3. Permission issues:
+```bash
+# Fix permissions on mounted volumes
+sudo chown -R 1000:1000 .
+```
+
+4. Build cache issues:
+```bash
+# Rebuild without cache
+docker-compose build --no-cache api
+```
+
 ## Running the API
 
 ### Local Development

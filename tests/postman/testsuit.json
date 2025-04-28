@@ -25,7 +25,18 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Accept both 200 and 409 as success (type already exists)",
+                                    "pm.test('Status code is acceptable', function () {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+                                    "});",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Entity type is registered successfully', function () {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('message');",
+                                    "        pm.expect(jsonData.message).to.include('Person');",
+                                    "    });",
+                                    "}"
                                 ]
                             }
                         }
@@ -53,17 +64,7 @@
                                 "entity-types"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Entity type is registered successfully', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData).to.have.property('message');",
-                        "    pm.expect(jsonData.message).to.include('Person');",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Register Company Type",
@@ -82,7 +83,18 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Accept both 200 and 409 as success (type already exists)",
+                                    "pm.test('Status code is acceptable', function () {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+                                    "});",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Entity type is registered successfully', function () {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('message');",
+                                    "        pm.expect(jsonData.message).to.include('Company');",
+                                    "    });",
+                                    "}"
                                 ]
                             }
                         }
@@ -110,17 +122,7 @@
                                 "entity-types"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Entity type is registered successfully', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData).to.have.property('message');",
-                        "    pm.expect(jsonData.message).to.include('Company');",
-                        "});"
-                    ]
+                    }
                 }
             ]
         },
@@ -144,7 +146,18 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Accept both 200 and 409 as success (type already exists)",
+                                    "pm.test('Status code is acceptable', function () {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+                                    "});",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Relation type is registered successfully', function () {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('message');",
+                                    "        pm.expect(jsonData.message).to.include('WORKS_AT');",
+                                    "    });",
+                                    "}"
                                 ]
                             }
                         }
@@ -172,17 +185,7 @@
                                 "relation-types"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Relation type is registered successfully', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData).to.have.property('message');",
-                        "    pm.expect(jsonData.message).to.include('WORKS_AT');",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Register KNOWS Type",
@@ -201,7 +204,18 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Accept both 200 and 409 as success (type already exists)",
+                                    "pm.test('Status code is acceptable', function () {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+                                    "});",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Relation type is registered successfully', function () {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('message');",
+                                    "        pm.expect(jsonData.message).to.include('KNOWS');",
+                                    "    });",
+                                    "}"
                                 ]
                             }
                         }
@@ -229,17 +243,7 @@
                                 "relation-types"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Relation type is registered successfully', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData).to.have.property('message');",
-                        "    pm.expect(jsonData.message).to.include('KNOWS');",
-                        "});"
-                    ]
+                    }
                 }
             ]
         },
@@ -254,7 +258,9 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Creating Alice...');"
+                                    "console.log('Creating Alice...');",
+                                    "// Clear any existing alice_id to ensure we're starting fresh",
+                                    "pm.environment.unset('alice_id');"
                                 ]
                             }
                         },
@@ -263,7 +269,29 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "// Verify entity is created with correct properties",
+                                    "pm.test('Entity is created with correct properties', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.entity_type).to.equal('Person');",
+                                    "    pm.expect(jsonData.properties.name).to.equal('Alice Smith');",
+                                    "    pm.expect(jsonData.properties.age).to.equal(30);",
+                                    "    pm.expect(jsonData.properties.occupation).to.equal('Software Engineer');",
+                                    "    // Set the alice_id variable",
+                                    "    if (jsonData.id) {",
+                                    "        pm.environment.set('alice_id', jsonData.id);",
+                                    "        console.log('Successfully set alice_id to:', jsonData.id);",
+                                    "        // Verify the variable was set",
+                                    "        var storedId = pm.environment.get('alice_id');",
+                                    "        console.log('Verified stored alice_id:', storedId);",
+                                    "    } else {",
+                                    "        console.error('No ID in response:', jsonData);",
+                                    "    }",
+                                    "});"
                                 ]
                             }
                         }
@@ -291,21 +319,7 @@
                                 "entities"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Entity is created with correct properties', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData.entity_type).to.equal('Person');",
-                        "    pm.expect(jsonData.properties.name).to.equal('Alice Smith');",
-                        "    pm.expect(jsonData.properties.age).to.equal(30);",
-                        "    pm.expect(jsonData.properties.occupation).to.equal('Software Engineer');",
-                        "    pm.environment.set('alice_id', jsonData.id);",
-                        "    console.log('Set alice_id to:', jsonData.id);",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Create Bob",
@@ -315,7 +329,9 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Creating Bob...');"
+                                    "console.log('Creating Bob...');",
+                                    "// Clear any existing bob_id to ensure we're starting fresh",
+                                    "pm.environment.unset('bob_id');"
                                 ]
                             }
                         },
@@ -324,7 +340,29 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "// Verify entity is created with correct properties",
+                                    "pm.test('Entity is created with correct properties', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.entity_type).to.equal('Person');",
+                                    "    pm.expect(jsonData.properties.name).to.equal('Bob Johnson');",
+                                    "    pm.expect(jsonData.properties.age).to.equal(35);",
+                                    "    pm.expect(jsonData.properties.occupation).to.equal('Data Scientist');",
+                                    "    // Set the bob_id variable",
+                                    "    if (jsonData.id) {",
+                                    "        pm.environment.set('bob_id', jsonData.id);",
+                                    "        console.log('Successfully set bob_id to:', jsonData.id);",
+                                    "        // Verify the variable was set",
+                                    "        var storedId = pm.environment.get('bob_id');",
+                                    "        console.log('Verified stored bob_id:', storedId);",
+                                    "    } else {",
+                                    "        console.error('No ID in response:', jsonData);",
+                                    "    }",
+                                    "});"
                                 ]
                             }
                         }
@@ -352,21 +390,7 @@
                                 "entities"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Entity is created with correct properties', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData.entity_type).to.equal('Person');",
-                        "    pm.expect(jsonData.properties.name).to.equal('Bob Johnson');",
-                        "    pm.expect(jsonData.properties.age).to.equal(35);",
-                        "    pm.expect(jsonData.properties.occupation).to.equal('Data Scientist');",
-                        "    pm.environment.set('bob_id', jsonData.id);",
-                        "    console.log('Set bob_id to:', jsonData.id);",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Create TechCorp",
@@ -376,7 +400,9 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Creating TechCorp...');"
+                                    "console.log('Creating TechCorp...');",
+                                    "// Clear any existing tech_corp_id to ensure we're starting fresh",
+                                    "pm.environment.unset('tech_corp_id');"
                                 ]
                             }
                         },
@@ -385,7 +411,29 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "// Verify entity is created with correct properties",
+                                    "pm.test('Entity is created with correct properties', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.entity_type).to.equal('Company');",
+                                    "    pm.expect(jsonData.properties.name).to.equal('TechCorp');",
+                                    "    pm.expect(jsonData.properties.founded).to.equal(2010);",
+                                    "    pm.expect(jsonData.properties.industry).to.equal('Technology');",
+                                    "    // Set the tech_corp_id variable",
+                                    "    if (jsonData.id) {",
+                                    "        pm.environment.set('tech_corp_id', jsonData.id);",
+                                    "        console.log('Successfully set tech_corp_id to:', jsonData.id);",
+                                    "        // Verify the variable was set",
+                                    "        var storedId = pm.environment.get('tech_corp_id');",
+                                    "        console.log('Verified stored tech_corp_id:', storedId);",
+                                    "    } else {",
+                                    "        console.error('No ID in response:', jsonData);",
+                                    "    }",
+                                    "});"
                                 ]
                             }
                         }
@@ -413,21 +461,7 @@
                                 "entities"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Entity is created with correct properties', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData.entity_type).to.equal('Company');",
-                        "    pm.expect(jsonData.properties.name).to.equal('TechCorp');",
-                        "    pm.expect(jsonData.properties.founded).to.equal(2010);",
-                        "    pm.expect(jsonData.properties.industry).to.equal('Technology');",
-                        "    pm.environment.set('tech_corp_id', jsonData.id);",
-                        "    console.log('Set tech_corp_id to:', jsonData.id);",
-                        "});"
-                    ]
+                    }
                 }
             ]
         },
@@ -443,8 +477,32 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "console.log('Creating Alice works at TechCorp relation...');",
-                                    "console.log('alice_id:', pm.environment.get('alice_id'));",
-                                    "console.log('tech_corp_id:', pm.environment.get('tech_corp_id'));"
+                                    "var aliceId = pm.environment.get('alice_id');",
+                                    "var techCorpId = pm.environment.get('tech_corp_id');",
+                                    "console.log('alice_id:', aliceId);",
+                                    "console.log('tech_corp_id:', techCorpId);",
+                                    "if (!aliceId) {",
+                                    "    console.error('alice_id is not set! Please run the Create Alice request first.');",
+                                    "    return;",
+                                    "}",
+                                    "if (!techCorpId) {",
+                                    "    console.error('tech_corp_id is not set! Please run the Create TechCorp request first.');",
+                                    "    return;",
+                                    "}",
+                                    "// Construct and set the request body with actual values",
+                                    "var requestBody = {",
+                                    "    relation_type: \"WORKS_AT\",",
+                                    "    from_entity: aliceId,",
+                                    "    to_entity: techCorpId,",
+                                    "    properties: {",
+                                    "        role: \"Senior Engineer\",",
+                                    "        start_date: 2020",
+                                    "    }",
+                                    "};",
+                                    "console.log('Request body:', JSON.stringify(requestBody, null, 2));",
+                                    "pm.request.body.raw = JSON.stringify(requestBody);",
+                                    "// Log the actual request being sent",
+                                    "console.log('Final request body:', pm.request.body.raw);"
                                 ]
                             }
                         },
@@ -453,7 +511,30 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "// Verify relation is created with correct properties",
+                                    "pm.test('Relation is created with correct properties', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.relation_type).to.equal('WORKS_AT');",
+                                    "    pm.expect(jsonData.from_entity).to.equal(pm.environment.get('alice_id'));",
+                                    "    pm.expect(jsonData.to_entity).to.equal(pm.environment.get('tech_corp_id'));",
+                                    "    pm.expect(jsonData.properties.role).to.equal('Senior Engineer');",
+                                    "    pm.expect(jsonData.properties.start_date).to.equal(2020);",
+                                    "    // Set the relation ID for future use",
+                                    "    if (jsonData.id) {",
+                                    "        pm.environment.set('alice_works_id', jsonData.id);",
+                                    "        console.log('Successfully set alice_works_id to:', jsonData.id);",
+                                    "        // Verify the variable was set",
+                                    "        var storedId = pm.environment.get('alice_works_id');",
+                                    "        console.log('Verified stored alice_works_id:', storedId);",
+                                    "    } else {",
+                                    "        console.error('No ID in response:', jsonData);",
+                                    "    }",
+                                    "});"
                                 ]
                             }
                         }
@@ -468,7 +549,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"relation_type\": \"WORKS_AT\", \"from_entity\": \"{{alice_id}}\", \"to_entity\": \"{{tech_corp_id}}\", \"properties\": {\"role\": \"Senior Engineer\", \"start_date\": 2020}}"
+                            "raw": "{}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/v1/relations",
@@ -481,22 +562,7 @@
                                 "relations"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Relation is created with correct properties', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData.relation_type).to.equal('WORKS_AT');",
-                        "    pm.expect(jsonData.from_entity).to.equal(pm.environment.get('alice_id'));",
-                        "    pm.expect(jsonData.to_entity).to.equal(pm.environment.get('tech_corp_id'));",
-                        "    pm.expect(jsonData.properties.role).to.equal('Senior Engineer');",
-                        "    pm.expect(jsonData.properties.start_date).to.equal(2020);",
-                        "    pm.environment.set('alice_works_id', jsonData.id);",
-                        "    console.log('Set alice_works_id to:', jsonData.id);",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Bob Works at TechCorp",
@@ -507,8 +573,30 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "console.log('Creating Bob works at TechCorp relation...');",
-                                    "console.log('bob_id:', pm.environment.get('bob_id'));",
-                                    "console.log('tech_corp_id:', pm.environment.get('tech_corp_id'));"
+                                    "var bobId = pm.environment.get('bob_id');",
+                                    "var techCorpId = pm.environment.get('tech_corp_id');",
+                                    "console.log('bob_id:', bobId);",
+                                    "console.log('tech_corp_id:', techCorpId);",
+                                    "if (!bobId) {",
+                                    "    console.error('bob_id is not set! Please run the Create Bob request first.');",
+                                    "    return;",
+                                    "}",
+                                    "if (!techCorpId) {",
+                                    "    console.error('tech_corp_id is not set! Please run the Create TechCorp request first.');",
+                                    "    return;",
+                                    "}",
+                                    "// Construct and set the request body with actual values",
+                                    "var requestBody = {",
+                                    "    relation_type: \"WORKS_AT\",",
+                                    "    from_entity: bobId,",
+                                    "    to_entity: techCorpId,",
+                                    "    properties: {",
+                                    "        role: \"Lead Data Scientist\",",
+                                    "        start_date: 2019",
+                                    "    }",
+                                    "};",
+                                    "console.log('Request body:', JSON.stringify(requestBody, null, 2));",
+                                    "pm.request.body.raw = JSON.stringify(requestBody);"
                                 ]
                             }
                         },
@@ -517,7 +605,30 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "// Verify relation is created with correct properties",
+                                    "pm.test('Relation is created with correct properties', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.relation_type).to.equal('WORKS_AT');",
+                                    "    pm.expect(jsonData.from_entity).to.equal(pm.environment.get('bob_id'));",
+                                    "    pm.expect(jsonData.to_entity).to.equal(pm.environment.get('tech_corp_id'));",
+                                    "    pm.expect(jsonData.properties.role).to.equal('Lead Data Scientist');",
+                                    "    pm.expect(jsonData.properties.start_date).to.equal(2019);",
+                                    "    // Set the relation ID for future use",
+                                    "    if (jsonData.id) {",
+                                    "        pm.environment.set('bob_works_id', jsonData.id);",
+                                    "        console.log('Successfully set bob_works_id to:', jsonData.id);",
+                                    "        // Verify the variable was set",
+                                    "        var storedId = pm.environment.get('bob_works_id');",
+                                    "        console.log('Verified stored bob_works_id:', storedId);",
+                                    "    } else {",
+                                    "        console.error('No ID in response:', jsonData);",
+                                    "    }",
+                                    "});"
                                 ]
                             }
                         }
@@ -532,7 +643,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"relation_type\": \"WORKS_AT\", \"from_entity\": \"{{bob_id}}\", \"to_entity\": \"{{tech_corp_id}}\", \"properties\": {\"role\": \"Lead Data Scientist\", \"start_date\": 2019}}"
+                            "raw": "{}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/v1/relations",
@@ -545,22 +656,7 @@
                                 "relations"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Relation is created with correct properties', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData.relation_type).to.equal('WORKS_AT');",
-                        "    pm.expect(jsonData.from_entity).to.equal(pm.environment.get('bob_id'));",
-                        "    pm.expect(jsonData.to_entity).to.equal(pm.environment.get('tech_corp_id'));",
-                        "    pm.expect(jsonData.properties.role).to.equal('Lead Data Scientist');",
-                        "    pm.expect(jsonData.properties.start_date).to.equal(2019);",
-                        "    pm.environment.set('bob_works_id', jsonData.id);",
-                        "    console.log('Set bob_works_id to:', jsonData.id);",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Alice Knows Bob",
@@ -571,8 +667,29 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "console.log('Creating Alice knows Bob relation...');",
-                                    "console.log('alice_id:', pm.environment.get('alice_id'));",
-                                    "console.log('bob_id:', pm.environment.get('bob_id'));"
+                                    "var aliceId = pm.environment.get('alice_id');",
+                                    "var bobId = pm.environment.get('bob_id');",
+                                    "console.log('alice_id:', aliceId);",
+                                    "console.log('bob_id:', bobId);",
+                                    "if (!aliceId) {",
+                                    "    console.error('alice_id is not set! Please run the Create Alice request first.');",
+                                    "    return;",
+                                    "}",
+                                    "if (!bobId) {",
+                                    "    console.error('bob_id is not set! Please run the Create Bob request first.');",
+                                    "    return;",
+                                    "}",
+                                    "// Construct and set the request body with actual values",
+                                    "var requestBody = {",
+                                    "    relation_type: \"KNOWS\",",
+                                    "    from_entity: aliceId,",
+                                    "    to_entity: bobId,",
+                                    "    properties: {",
+                                    "        since: 2021",
+                                    "    }",
+                                    "};",
+                                    "console.log('Request body:', JSON.stringify(requestBody, null, 2));",
+                                    "pm.request.body.raw = JSON.stringify(requestBody);"
                                 ]
                             }
                         },
@@ -581,7 +698,29 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "// Verify relation is created with correct properties",
+                                    "pm.test('Relation is created with correct properties', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.relation_type).to.equal('KNOWS');",
+                                    "    pm.expect(jsonData.from_entity).to.equal(pm.environment.get('alice_id'));",
+                                    "    pm.expect(jsonData.to_entity).to.equal(pm.environment.get('bob_id'));",
+                                    "    pm.expect(jsonData.properties.since).to.equal(2021);",
+                                    "    // Set the relation ID for future use",
+                                    "    if (jsonData.id) {",
+                                    "        pm.environment.set('alice_knows_id', jsonData.id);",
+                                    "        console.log('Successfully set alice_knows_id to:', jsonData.id);",
+                                    "        // Verify the variable was set",
+                                    "        var storedId = pm.environment.get('alice_knows_id');",
+                                    "        console.log('Verified stored alice_knows_id:', storedId);",
+                                    "    } else {",
+                                    "        console.error('No ID in response:', jsonData);",
+                                    "    }",
+                                    "});"
                                 ]
                             }
                         }
@@ -596,7 +735,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"relation_type\": \"KNOWS\", \"from_entity\": \"{{alice_id}}\", \"to_entity\": \"{{bob_id}}\", \"properties\": {\"since\": 2021}}"
+                            "raw": "{}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/v1/relations",
@@ -609,21 +748,7 @@
                                 "relations"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Relation is created with correct properties', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData.relation_type).to.equal('KNOWS');",
-                        "    pm.expect(jsonData.from_entity).to.equal(pm.environment.get('alice_id'));",
-                        "    pm.expect(jsonData.to_entity).to.equal(pm.environment.get('bob_id'));",
-                        "    pm.expect(jsonData.properties.since).to.equal(2021);",
-                        "    pm.environment.set('alice_knows_id', jsonData.id);",
-                        "    console.log('Set alice_knows_id to:', jsonData.id);",
-                        "});"
-                    ]
+                    }
                 }
             ]
         },
@@ -769,7 +894,21 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "console.log(\"Updating Alice's age...\");",
-                                    "console.log('alice_id:', pm.environment.get('alice_id'));"
+                                    "var aliceId = pm.environment.get('alice_id');",
+                                    "console.log('alice_id:', aliceId);",
+                                    "if (!aliceId) {",
+                                    "    console.error('alice_id is not set! Please run the Create Alice request first.');",
+                                    "    return;",
+                                    "}",
+                                    "// Set the URL dynamically with the actual ID",
+                                    "var baseUrl = pm.environment.get('base_url');",
+                                    "if (!baseUrl) {",
+                                    "    console.error('base_url is not set!');",
+                                    "    return;",
+                                    "}",
+                                    "var url = baseUrl + '/api/v1/entities/' + aliceId;",
+                                    "console.log('Request URL:', url);",
+                                    "pm.request.url = url;"
                                 ]
                             }
                         },
@@ -778,7 +917,17 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "// Verify entity is updated with correct properties",
+                                    "pm.test('Entity is updated with correct properties', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.properties.name).to.equal('Alice Smith');",
+                                    "    pm.expect(jsonData.properties.age).to.equal(31);",
+                                    "});"
                                 ]
                             }
                         }
@@ -807,17 +956,7 @@
                                 "{{alice_id}}"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Entity is updated with correct properties', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData.properties.name).to.equal('Alice Smith');",
-                        "    pm.expect(jsonData.properties.age).to.equal(31);",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Update Alice's Role",
@@ -828,7 +967,21 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "console.log(\"Updating Alice's role...\");",
-                                    "console.log('alice_works_id:', pm.environment.get('alice_works_id'));"
+                                    "var aliceWorksId = pm.environment.get('alice_works_id');",
+                                    "console.log('alice_works_id:', aliceWorksId);",
+                                    "if (!aliceWorksId) {",
+                                    "    console.error('alice_works_id is not set! Please run the Alice Works at TechCorp request first.');",
+                                    "    return;",
+                                    "}",
+                                    "// Set the URL dynamically with the actual ID",
+                                    "var baseUrl = pm.environment.get('base_url');",
+                                    "if (!baseUrl) {",
+                                    "    console.error('base_url is not set!');",
+                                    "    return;",
+                                    "}",
+                                    "var url = baseUrl + '/api/v1/relations/' + aliceWorksId;",
+                                    "console.log('Request URL:', url);",
+                                    "pm.request.url = url;"
                                 ]
                             }
                         },
@@ -837,7 +990,17 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "// Verify relation is updated with correct properties",
+                                    "pm.test('Relation is updated with correct properties', function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.properties.role).to.equal('Principal Engineer');",
+                                    "    pm.expect(jsonData.properties.start_date).to.equal(2020);",
+                                    "});"
                                 ]
                             }
                         }
@@ -866,17 +1029,7 @@
                                 "{{alice_works_id}}"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});",
-                        "pm.test('Relation is updated with correct properties', function () {",
-                        "    var jsonData = pm.response.json();",
-                        "    pm.expect(jsonData.properties.role).to.equal('Principal Engineer');",
-                        "    pm.expect(jsonData.properties.start_date).to.equal(2020);",
-                        "});"
-                    ]
+                    }
                 }
             ]
         },
@@ -892,7 +1045,21 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "console.log('Deleting Alice knows Bob relation...');",
-                                    "console.log('alice_knows_id:', pm.environment.get('alice_knows_id'));"
+                                    "var aliceKnowsId = pm.environment.get('alice_knows_id');",
+                                    "console.log('alice_knows_id:', aliceKnowsId);",
+                                    "if (!aliceKnowsId) {",
+                                    "    console.error('alice_knows_id is not set! Please run the Alice Knows Bob request first.');",
+                                    "    return;",
+                                    "}",
+                                    "// Set the URL dynamically with the actual ID",
+                                    "var baseUrl = pm.environment.get('base_url');",
+                                    "if (!baseUrl) {",
+                                    "    console.error('base_url is not set!');",
+                                    "    return;",
+                                    "}",
+                                    "var url = baseUrl + '/api/v1/relations/' + aliceKnowsId;",
+                                    "console.log('Request URL:', url);",
+                                    "pm.request.url = url;"
                                 ]
                             }
                         },
@@ -901,7 +1068,11 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
                                 ]
                             }
                         }
@@ -920,12 +1091,7 @@
                                 "{{alice_knows_id}}"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Verify Relation Deleted",
@@ -936,7 +1102,21 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "console.log('Verifying Alice knows Bob relation is deleted...');",
-                                    "console.log('alice_knows_id:', pm.environment.get('alice_knows_id'));"
+                                    "var aliceKnowsId = pm.environment.get('alice_knows_id');",
+                                    "console.log('alice_knows_id:', aliceKnowsId);",
+                                    "if (!aliceKnowsId) {",
+                                    "    console.error('alice_knows_id is not set! Please run the Alice Knows Bob request first.');",
+                                    "    return;",
+                                    "}",
+                                    "// Set the URL dynamically with the actual ID",
+                                    "var baseUrl = pm.environment.get('base_url');",
+                                    "if (!baseUrl) {",
+                                    "    console.error('base_url is not set!');",
+                                    "    return;",
+                                    "}",
+                                    "var url = baseUrl + '/api/v1/relations/' + aliceKnowsId;",
+                                    "console.log('Request URL:', url);",
+                                    "pm.request.url = url;"
                                 ]
                             }
                         },
@@ -945,7 +1125,11 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is 404 (Not Found)",
+                                    "pm.test('Status code is 404', function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
                                 ]
                             }
                         }
@@ -964,12 +1148,7 @@
                                 "{{alice_knows_id}}"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 404', function () {",
-                        "    pm.response.to.have.status(404);",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Delete Bob",
@@ -980,7 +1159,21 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "console.log('Deleting Bob...');",
-                                    "console.log('bob_id:', pm.environment.get('bob_id'));"
+                                    "var bobId = pm.environment.get('bob_id');",
+                                    "console.log('bob_id:', bobId);",
+                                    "if (!bobId) {",
+                                    "    console.error('bob_id is not set! Please run the Create Bob request first.');",
+                                    "    return;",
+                                    "}",
+                                    "// Set the URL dynamically with the actual ID",
+                                    "var baseUrl = pm.environment.get('base_url');",
+                                    "if (!baseUrl) {",
+                                    "    console.error('base_url is not set!');",
+                                    "    return;",
+                                    "}",
+                                    "var url = baseUrl + '/api/v1/entities/' + bobId;",
+                                    "console.log('Request URL:', url);",
+                                    "pm.request.url = url;"
                                 ]
                             }
                         },
@@ -989,7 +1182,11 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is successful",
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
                                 ]
                             }
                         }
@@ -1008,12 +1205,7 @@
                                 "{{bob_id}}"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 200', function () {",
-                        "    pm.response.to.have.status(200);",
-                        "});"
-                    ]
+                    }
                 },
                 {
                     "name": "Verify Bob Deleted",
@@ -1024,7 +1216,21 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "console.log('Verifying Bob is deleted...');",
-                                    "console.log('bob_id:', pm.environment.get('bob_id'));"
+                                    "var bobId = pm.environment.get('bob_id');",
+                                    "console.log('bob_id:', bobId);",
+                                    "if (!bobId) {",
+                                    "    console.error('bob_id is not set! Please run the Create Bob request first.');",
+                                    "    return;",
+                                    "}",
+                                    "// Set the URL dynamically with the actual ID",
+                                    "var baseUrl = pm.environment.get('base_url');",
+                                    "if (!baseUrl) {",
+                                    "    console.error('base_url is not set!');",
+                                    "    return;",
+                                    "}",
+                                    "var url = baseUrl + '/api/v1/entities/' + bobId;",
+                                    "console.log('Request URL:', url);",
+                                    "pm.request.url = url;"
                                 ]
                             }
                         },
@@ -1033,7 +1239,11 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "console.log('Response:', pm.response.json());"
+                                    "console.log('Response:', pm.response.json());",
+                                    "// Verify response is 404 (Not Found)",
+                                    "pm.test('Status code is 404', function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
                                 ]
                             }
                         }
@@ -1052,12 +1262,7 @@
                                 "{{bob_id}}"
                             ]
                         }
-                    },
-                    "test": [
-                        "pm.test('Status code is 404', function () {",
-                        "    pm.response.to.have.status(404);",
-                        "});"
-                    ]
+                    }
                 }
             ]
         }
@@ -1068,9 +1273,27 @@
             "script": {
                 "type": "text/javascript",
                 "exec": [
+                    "// Initialize base_url if not set",
                     "if (!pm.environment.get('base_url')) {",
                     "    pm.environment.set('base_url', 'http://127.0.0.1:8000');",
-                    "}"
+                    "    console.log('Set base_url to:', pm.environment.get('base_url'));",
+                    "}",
+                    "// Clear any existing entity IDs to ensure clean state",
+                    "pm.environment.unset('alice_id');",
+                    "pm.environment.unset('bob_id');",
+                    "pm.environment.unset('tech_corp_id');",
+                    "pm.environment.unset('alice_works_id');",
+                    "pm.environment.unset('bob_works_id');",
+                    "pm.environment.unset('alice_knows_id');",
+                    "console.log('Collection pre-request: Environment variables cleared');",
+                    "// Verify environment is clean",
+                    "console.log('Environment state after clearing:');",
+                    "console.log('alice_id:', pm.environment.get('alice_id'));",
+                    "console.log('bob_id:', pm.environment.get('bob_id'));",
+                    "console.log('tech_corp_id:', pm.environment.get('tech_corp_id'));",
+                    "console.log('alice_works_id:', pm.environment.get('alice_works_id'));",
+                    "console.log('bob_works_id:', pm.environment.get('bob_works_id'));",
+                    "console.log('alice_knows_id:', pm.environment.get('alice_knows_id'));"
                 ]
             }
         },
@@ -1079,7 +1302,14 @@
             "script": {
                 "type": "text/javascript",
                 "exec": [
-                    ""
+                    "// Log current environment state after each request",
+                    "console.log('Collection test: Current environment state:');",
+                    "console.log('alice_id:', pm.environment.get('alice_id'));",
+                    "console.log('bob_id:', pm.environment.get('bob_id'));",
+                    "console.log('tech_corp_id:', pm.environment.get('tech_corp_id'));",
+                    "console.log('alice_works_id:', pm.environment.get('alice_works_id'));",
+                    "console.log('bob_works_id:', pm.environment.get('bob_works_id'));",
+                    "console.log('alice_knows_id:', pm.environment.get('alice_knows_id'));"
                 ]
             }
         }
