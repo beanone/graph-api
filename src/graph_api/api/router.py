@@ -8,6 +8,7 @@ import logging
 from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
 from graph_context.exceptions import (
     EntityNotFoundError,
     RelationNotFoundError,
@@ -51,14 +52,12 @@ def handle_validation_error(e: ValidationError) -> HTTPException:
     Returns:
         HTTPException: The HTTP exception to raise
     """
-    return HTTPException(
-        status_code=400,
-        detail={
-            "message": str(e),
-            "field": e.field,
-            "constraint": e.constraint,
-        },
-    )
+    error = {"message": str(e)}
+    if hasattr(e, "field"):
+        error["field"] = e.field
+    if hasattr(e, "constraint"):
+        error["constraint"] = e.constraint
+    raise HTTPException(status_code=400, detail=error)
 
 
 def handle_schema_error(e: SchemaError) -> HTTPException:
@@ -70,15 +69,7 @@ def handle_schema_error(e: SchemaError) -> HTTPException:
     Returns:
         HTTPException: The HTTP exception to raise
     """
-    print("--------------------------------")
-    print("Schema error: ", e)
-    print("--------------------------------")
-    return HTTPException(
-        status_code=400,
-        detail={
-            "message": str(e),
-        },
-    )
+    return HTTPException(status_code=400, detail={"message": str(e)})
 
 
 def handle_not_found_error(e: Exception) -> HTTPException:
@@ -90,7 +81,7 @@ def handle_not_found_error(e: Exception) -> HTTPException:
     Returns:
         HTTPException: The HTTP exception to raise
     """
-    return HTTPException(status_code=404, detail=str(e))
+    return HTTPException(status_code=404, detail={"message": str(e)})
 
 
 def handle_transaction_error(e: TransactionError) -> HTTPException:
@@ -102,7 +93,7 @@ def handle_transaction_error(e: TransactionError) -> HTTPException:
     Returns:
         HTTPException: The HTTP exception to raise
     """
-    return HTTPException(status_code=500, detail=str(e))
+    return HTTPException(status_code=500, detail={"message": str(e)})
 
 
 @router.post("/entities", response_model=EntityResponse)
@@ -116,10 +107,12 @@ async def create_entity(
         service: The graph service
 
     Returns:
-        dict: The created entity
+        dict: The created entity with id, entity_type, and properties
     """
     try:
-        return await service.create_entity(entity)
+        return await service.create_entity(
+            entity_type=entity.entity_type, properties=entity.properties
+        )
     except ValidationError as e:
         raise handle_validation_error(e)
     except SchemaError as e:
@@ -152,29 +145,28 @@ async def get_entity(
 @router.put("/entities/{entity_id}", response_model=EntityResponse)
 async def update_entity(
     entity_id: str,
-    entity: EntityUpdate,
-    service: GraphService = Depends(get_graph_service),
-) -> Dict[str, Any]:
+    entity_update: EntityUpdate,
+    graph_service: GraphService = Depends(get_graph_service),
+) -> EntityResponse:
     """Update an entity.
 
     Args:
-        entity_id: The entity ID
-        entity: The entity update
-        service: The graph service
+        entity_id: ID of the entity to update
+        entity_update: Updated entity properties
+        graph_service: Graph service instance
 
     Returns:
-        dict: The updated entity
+        EntityResponse: Updated entity
     """
     try:
-        return await service.update_entity(entity_id, entity)
-    except EntityNotFoundError as e:
-        raise handle_not_found_error(e)
+        entity = await graph_service.update_entity(entity_id, entity_update.dict())
+        return entity
     except ValidationError as e:
-        raise handle_validation_error(e)
-    except SchemaError as e:
-        raise handle_schema_error(e)
+        raise HTTPException(status_code=400, detail={"message": str(e)})
+    except EntityNotFoundError as e:
+        raise HTTPException(status_code=404, detail={"message": str(e)})
     except TransactionError as e:
-        raise handle_transaction_error(e)
+        raise HTTPException(status_code=500, detail={"message": str(e)})
 
 
 @router.delete("/entities/{entity_id}")
@@ -191,7 +183,8 @@ async def delete_entity(
         dict: The deletion status
     """
     try:
-        return await service.delete_entity(entity_id)
+        await service.delete_entity(entity_id)
+        return {"message": f"Entity {entity_id} deleted successfully"}
     except EntityNotFoundError as e:
         raise handle_not_found_error(e)
     except TransactionError as e:
@@ -209,10 +202,15 @@ async def create_relation(
         service: The graph service
 
     Returns:
-        dict: The created relation
+        dict: The created relation with id, relation_type, from_entity, to_entity, and properties
     """
     try:
-        return await service.create_relation(relation)
+        return await service.create_relation(
+            relation_type=relation.relation_type,
+            from_entity=relation.from_entity,
+            to_entity=relation.to_entity,
+            properties=relation.properties,
+        )
     except EntityNotFoundError as e:
         raise handle_not_found_error(e)
     except ValidationError as e:
@@ -247,29 +245,30 @@ async def get_relation(
 @router.put("/relations/{relation_id}", response_model=RelationResponse)
 async def update_relation(
     relation_id: str,
-    relation: RelationUpdate,
-    service: GraphService = Depends(get_graph_service),
-) -> Dict[str, Any]:
+    relation_update: RelationUpdate,
+    graph_service: GraphService = Depends(get_graph_service),
+) -> RelationResponse:
     """Update a relation.
 
     Args:
-        relation_id: The relation ID
-        relation: The relation update
-        service: The graph service
+        relation_id: ID of the relation to update
+        relation_update: Updated relation properties
+        graph_service: Graph service instance
 
     Returns:
-        dict: The updated relation
+        RelationResponse: Updated relation
     """
     try:
-        return await service.update_relation(relation_id, relation)
-    except RelationNotFoundError as e:
-        raise handle_not_found_error(e)
+        relation = await graph_service.update_relation(
+            relation_id, relation_update.dict()
+        )
+        return relation
     except ValidationError as e:
-        raise handle_validation_error(e)
-    except SchemaError as e:
-        raise handle_schema_error(e)
+        raise HTTPException(status_code=400, detail={"message": str(e)})
+    except RelationNotFoundError as e:
+        raise HTTPException(status_code=404, detail={"message": str(e)})
     except TransactionError as e:
-        raise handle_transaction_error(e)
+        raise HTTPException(status_code=500, detail={"message": str(e)})
 
 
 @router.delete("/relations/{relation_id}")
@@ -286,50 +285,55 @@ async def delete_relation(
         dict: The deletion status
     """
     try:
-        return await service.delete_relation(relation_id)
+        await service.delete_relation(relation_id)
+        return {"message": f"Relation {relation_id} deleted successfully"}
     except RelationNotFoundError as e:
         raise handle_not_found_error(e)
     except TransactionError as e:
         raise handle_transaction_error(e)
 
 
-@router.post("/query", response_model=List[RelationResponse])
-async def query_relations(
-    query: QueryRequest, service: GraphService = Depends(get_graph_service)
-) -> List[Dict[str, Any]]:
-    """Query relations.
+@router.post("/query", response_model=List[EntityResponse])
+async def query_entities(
+    query_request: QueryRequest,
+    graph_service: GraphService = Depends(get_graph_service),
+) -> List[EntityResponse]:
+    """Query entities.
 
     Args:
-        query: The query request
-        service: The graph service
+        query_request: Query request
+        graph_service: Graph service instance
 
     Returns:
-        list: The matching relations
+        List[EntityResponse]: List of entities matching the query
     """
     try:
-        return await service.query_relations(query)
+        entities = await graph_service.query(query_request.query_spec)
+        return entities
     except ValidationError as e:
-        raise handle_validation_error(e)
+        raise HTTPException(status_code=400, detail={"message": str(e)})
     except SchemaError as e:
-        raise handle_schema_error(e)
+        raise HTTPException(status_code=400, detail={"message": str(e)})
     except TransactionError as e:
-        raise handle_transaction_error(e)
+        raise HTTPException(status_code=500, detail={"message": str(e)})
 
 
 @router.post("/entity-types")
 async def register_entity_type(
-    entity_type: EntityType, service: GraphService = Depends(get_graph_service)
+    request: Request, service: GraphService = Depends(get_graph_service)
 ) -> Dict[str, Any]:
     """Register a new entity type.
 
     Args:
-        entity_type: The entity type definition to register
+        request: The request
         service: The graph service
 
     Returns:
-        dict: Success message
+        dict: The registration status
     """
     try:
+        data = await request.json()
+        entity_type = EntityType(**data)
         await service.register_entity_type(entity_type)
         return {"message": f"Entity type {entity_type.name} registered successfully"}
     except ValidationError as e:
@@ -338,22 +342,26 @@ async def register_entity_type(
         raise handle_schema_error(e)
     except TransactionError as e:
         raise handle_transaction_error(e)
+    except Exception as e:
+        raise handle_validation_error(ValidationError(str(e)))
 
 
 @router.post("/relation-types")
 async def register_relation_type(
-    relation_type: RelationType, service: GraphService = Depends(get_graph_service)
+    request: Request, service: GraphService = Depends(get_graph_service)
 ) -> Dict[str, Any]:
     """Register a new relation type.
 
     Args:
-        relation_type: The relation type definition to register
+        request: The request
         service: The graph service
 
     Returns:
-        dict: Success message
+        dict: The registration status
     """
     try:
+        data = await request.json()
+        relation_type = RelationType(**data)
         await service.register_relation_type(relation_type)
         return {
             "message": f"Relation type {relation_type.name} registered successfully"
@@ -364,3 +372,5 @@ async def register_relation_type(
         raise handle_schema_error(e)
     except TransactionError as e:
         raise handle_transaction_error(e)
+    except Exception as e:
+        raise handle_validation_error(ValidationError(str(e)))

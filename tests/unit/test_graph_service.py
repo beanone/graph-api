@@ -4,7 +4,7 @@ This module contains unit tests for the GraphService class, which provides
 the core functionality for graph operations.
 """
 
-from typing import Any, AsyncGenerator, Dict
+from typing import AsyncGenerator
 
 import pytest
 import pytest_asyncio
@@ -16,7 +16,6 @@ from graph_context import (
     EntityNotFoundError,
     RelationNotFoundError,
     SchemaError,
-    TransactionError,
     ValidationError,
 )
 from graph_context.types import (
@@ -24,7 +23,6 @@ from graph_context.types import (
     PropertyDefinition,
     PropertyType,
     QueryCondition,
-    QueryOperator,
     QuerySpec,
     RelationType,
 )
@@ -505,7 +503,7 @@ async def test_query_success(
         "to_entity": person2_created["id"],
         "properties": {"since": 2023},
     }
-    created_relation = await graph_service.create_relation(
+    await graph_service.create_relation(
         relation_type=relation_data["relation_type"],
         from_entity=relation_data["from_entity"],
         to_entity=relation_data["to_entity"],
@@ -520,7 +518,7 @@ async def test_query_success(
     result = await graph_service.query(query_spec)
     assert len(result) == 1
     assert result[0]["id"] == person1_created["id"]
-    assert result[0]["type"] == "Person"
+    assert result[0]["entity_type"] == "Person"
     assert result[0]["properties"]["name"] == "John Doe"
     assert result[0]["properties"]["age"] == 30
 
@@ -569,7 +567,7 @@ async def test_query_multiple_conditions(
         "to_entity": person2_created["id"],
         "properties": {"since": 2023},
     }
-    created_relation = await graph_service.create_relation(
+    await graph_service.create_relation(
         relation_type=relation_data["relation_type"],
         from_entity=relation_data["from_entity"],
         to_entity=relation_data["to_entity"],
@@ -587,7 +585,7 @@ async def test_query_multiple_conditions(
     result = await graph_service.query(query_spec)
     assert len(result) == 1
     assert result[0]["id"] == person1_created["id"]
-    assert result[0]["type"] == "Person"
+    assert result[0]["entity_type"] == "Person"
     assert result[0]["properties"]["name"] == "John Doe"
     assert result[0]["properties"]["age"] == 30
 

@@ -20,8 +20,6 @@ from graph_context.types import (
     EntityType,
     PropertyDefinition,
     PropertyType,
-    QueryCondition,
-    QueryOperator,
     QuerySpec,
     RelationType,
 )
@@ -450,7 +448,7 @@ class GraphService:
                 return [
                     {
                         "id": result.id,
-                        "type": result.type,
+                        "entity_type": result.type,
                         "properties": result.properties,
                     }
                     for result in results

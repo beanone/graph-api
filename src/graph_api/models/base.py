@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from graph_context.types import PropertyDefinition, PropertyType, RelationType
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 
 
 class EntityBase(BaseModel):
@@ -27,10 +27,18 @@ class EntityCreate(BaseModel):
     properties: Dict = Field(default_factory=dict, description="Entity properties")
 
 
-class EntityUpdate(BaseModel):
+class EntityUpdate(RootModel):
     """Model for entity updates."""
 
-    properties: Dict = Field(..., description="Updated entity properties")
+    root: Dict[str, Any] = Field(..., description="Updated entity properties")
+
+    def dict(self, *args, **kwargs):
+        """Convert the model to a dictionary.
+
+        Returns:
+            dict: The model as a dictionary
+        """
+        return self.root
 
 
 class EntityResponse(BaseModel):
@@ -61,17 +69,58 @@ class RelationCreate(BaseModel):
     properties: Dict = Field(default_factory=dict, description="Relation properties")
 
 
-class RelationUpdate(BaseModel):
+class RelationUpdate(RootModel):
     """Model for relation updates."""
 
-    properties: Dict = Field(..., description="Updated relation properties")
+    root: Dict[str, Any] = Field(..., description="Updated relation properties")
+
+    def dict(self, *args, **kwargs):
+        """Convert the model to a dictionary.
+
+        Returns:
+            dict: The model as a dictionary
+        """
+        return self.root
 
 
 class RelationResponse(BaseModel):
     """Model for relation responses."""
 
     id: str = Field(..., description="Relation ID")
-    relation_type: str = Field(..., description="Type of the relation")
+    type: str = Field(..., description="Type of the relation")
     from_entity: str = Field(..., description="Source entity ID")
     to_entity: str = Field(..., description="Target entity ID")
     properties: Dict = Field(..., description="Relation properties")
+
+    def dict(self, *args, **kwargs):
+        """Convert the model to a dictionary.
+
+        Returns:
+            dict: The model as a dictionary
+        """
+        d = super().dict(*args, **kwargs)
+        d["relation_type"] = d.pop("type")
+        return d
+
+
+class QueryCondition(BaseModel):
+    """Model for query conditions."""
+
+    field: str = Field(..., description="Field to query on")
+    operator: str = Field(..., description="Query operator")
+    value: Any = Field(..., description="Query value")
+
+
+class QuerySpec(BaseModel):
+    """Model for query specification."""
+
+    entity_type: str = Field(..., description="Type of entity to query")
+    conditions: List[QueryCondition] = Field(
+        default_factory=list, description="Query conditions"
+    )
+
+
+class QueryRequest(BaseModel):
+    """Model for query requests."""
+
+    query_spec: QuerySpec = Field(..., description="Query specification")

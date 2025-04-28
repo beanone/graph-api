@@ -1,10 +1,19 @@
 """Main FastAPI application module."""
 
-from fastapi import FastAPI
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from graph_context import BaseGraphContext
 
 from .api.router import router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.graph_context = BaseGraphContext()
+    yield
 
 
 def create_app() -> FastAPI:
@@ -17,6 +26,7 @@ def create_app() -> FastAPI:
         title="Graph API",
         description="REST API wrapper for graph-context library",
         version="0.1.0",
+        lifespan=lifespan,
     )
 
     # Configure CORS
@@ -33,11 +43,20 @@ def create_app() -> FastAPI:
 
     app.include_router(router)
 
-    # Initialize graph context on startup
+    # Add exception handler
 
-    @app.on_event("startup")
-    async def startup_event():
-        app.state.graph_context = BaseGraphContext()
+    @app.exception_handler(HTTPException)
+    async def http_exception_handler(request, exc: HTTPException) -> JSONResponse:
+        """Handle HTTP exceptions.
+
+        Args:
+            request: The request
+            exc: The exception
+
+        Returns:
+            JSONResponse: The error response
+        """
+        return JSONResponse(status_code=exc.status_code, content=exc.detail)
 
     return app
 
