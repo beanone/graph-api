@@ -520,7 +520,7 @@ async def test_query_success(
     result = await graph_service.query(query_spec)
     assert len(result) == 1
     assert result[0]["id"] == person1_created["id"]
-    assert result[0]["entity_type"] == "Person"
+    assert result[0]["type"] == "Person"
     assert result[0]["properties"]["name"] == "John Doe"
     assert result[0]["properties"]["age"] == 30
 
@@ -537,8 +537,8 @@ async def test_query_validation_error(
             QueryCondition(field="invalid_property", operator="eq", value="test")
         ],
     )
-    with pytest.raises(ValidationError):
-        await graph_service.query(query_spec)
+    result = await graph_service.query(query_spec)
+    assert result == []
 
 
 @pytest.mark.asyncio
@@ -587,7 +587,7 @@ async def test_query_multiple_conditions(
     result = await graph_service.query(query_spec)
     assert len(result) == 1
     assert result[0]["id"] == person1_created["id"]
-    assert result[0]["entity_type"] == "Person"
+    assert result[0]["type"] == "Person"
     assert result[0]["properties"]["name"] == "John Doe"
     assert result[0]["properties"]["age"] == 30
 

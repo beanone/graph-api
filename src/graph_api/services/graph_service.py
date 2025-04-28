@@ -459,7 +459,7 @@ class GraphService:
                 if self._context._transaction._in_transaction:
                     await self._context.rollback_transaction()
                 raise e
-        except (ValidationError, EntityNotFoundError):
+        except (ValidationError, EntityNotFoundError) as ee:
             raise
         except Exception as e:
             raise ValidationError(f"Invalid query specification: {str(e)}")
