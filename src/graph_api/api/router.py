@@ -333,16 +333,39 @@ async def register_entity_type(
     """
     try:
         data = await request.json()
+        print("DEBUG: Received entity type data:", data)
         entity_type = EntityType(**data)
+        print("DEBUG: Created entity type object:", entity_type.name)
+
+        # Check if entity type already exists
+
+        exists = await service.has_entity_type(entity_type.name)
+        print("DEBUG: has_entity_type check result:", exists)
+
+        if exists:
+            print("DEBUG: Entity type exists, raising 409")
+            raise HTTPException(
+                status_code=409,
+                detail={"message": f"Entity type {entity_type.name} already exists"},
+            )
+        print("DEBUG: Registering new entity type")
         await service.register_entity_type(entity_type)
         return {"message": f"Entity type {entity_type.name} registered successfully"}
+    except HTTPException:
+        # Re-raise HTTP exceptions without modification
+
+        raise
     except ValidationError as e:
+        print("DEBUG: Caught ValidationError:", str(e))
         raise handle_validation_error(e)
     except SchemaError as e:
+        print("DEBUG: Caught SchemaError:", str(e))
         raise handle_schema_error(e)
     except TransactionError as e:
+        print("DEBUG: Caught TransactionError:", str(e))
         raise handle_transaction_error(e)
     except Exception as e:
+        print("DEBUG: Caught unexpected error:", str(e))
         raise handle_validation_error(ValidationError(str(e)))
 
 
@@ -361,18 +384,43 @@ async def register_relation_type(
     """
     try:
         data = await request.json()
+        print("DEBUG: Received relation type data:", data)
         relation_type = RelationType(**data)
+        print("DEBUG: Created relation type object:", relation_type.name)
+
+        # Check if relation type already exists
+
+        exists = await service.has_relation_type(relation_type.name)
+        print("DEBUG: has_relation_type check result:", exists)
+
+        if exists:
+            print("DEBUG: Relation type exists, raising 409")
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "message": f"Relation type {relation_type.name} already exists"
+                },
+            )
+        print("DEBUG: Registering new relation type")
         await service.register_relation_type(relation_type)
         return {
             "message": f"Relation type {relation_type.name} registered successfully"
         }
+    except HTTPException:
+        # Re-raise HTTP exceptions without modification
+
+        raise
     except ValidationError as e:
+        print("DEBUG: Caught ValidationError:", str(e))
         raise handle_validation_error(e)
     except SchemaError as e:
+        print("DEBUG: Caught SchemaError:", str(e))
         raise handle_schema_error(e)
     except TransactionError as e:
+        print("DEBUG: Caught TransactionError:", str(e))
         raise handle_transaction_error(e)
     except Exception as e:
+        print("DEBUG: Caught unexpected error:", str(e))
         raise handle_validation_error(ValidationError(str(e)))
 
 

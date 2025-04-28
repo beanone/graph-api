@@ -777,3 +777,57 @@ async def test_has_relation_type_not_exists(client: TestClient) -> None:
         response.json()["detail"]["message"]
         == "Relation type NonExistentType not found"
     )
+
+
+@pytest.mark.asyncio
+async def test_register_entity_type_already_exists(client: TestClient) -> None:
+    """Test registering an entity type that already exists."""
+    # First register an entity type
+    entity_type_data = {
+        "name": "Company",
+        "description": "A company entity",
+        "properties": {
+            "name": {"type": "string", "required": True},
+            "founded": {"type": "integer", "required": True},
+        },
+        "indexes": ["name", "founded"],
+    }
+    client.post("/api/v1/entity-types", json=entity_type_data)
+
+    # Try to register the same entity type again
+    response = client.post("/api/v1/entity-types", json=entity_type_data)
+    assert response.status_code == 409
+    assert response.json()["detail"]["message"] == "Entity type Company already exists"
+
+
+@pytest.mark.asyncio
+async def test_register_relation_type_already_exists(client: TestClient) -> None:
+    """Test registering a relation type that already exists."""
+    # First register required entity types
+    company_type_data = {
+        "name": "Company",
+        "description": "A company entity",
+        "properties": {
+            "name": {"type": "string", "required": True},
+        },
+    }
+    client.post("/api/v1/entity-types", json=company_type_data)
+
+    # Register a relation type
+    relation_type_data = {
+        "name": "WORKS_AT",
+        "description": "A relationship between person and company",
+        "properties": {
+            "role": {"type": "string", "required": True},
+        },
+        "from_types": ["Person"],
+        "to_types": ["Company"],
+    }
+    client.post("/api/v1/relation-types", json=relation_type_data)
+
+    # Try to register the same relation type again
+    response = client.post("/api/v1/relation-types", json=relation_type_data)
+    assert response.status_code == 409
+    assert (
+        response.json()["detail"]["message"] == "Relation type WORKS_AT already exists"
+    )
