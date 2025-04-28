@@ -4,7 +4,7 @@ This module provides the core service layer for graph operations,
 handling business logic and orchestration.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from fastapi import Request
 
@@ -12,11 +12,19 @@ from graph_context import (
     EntityNotFoundError,
     GraphContext,
     RelationNotFoundError,
+    SchemaError,
     TransactionError,
     ValidationError,
 )
-
-from ..models.base import EntityCreate, EntityUpdate, RelationCreate, RelationUpdate
+from graph_context.types import (
+    EntityType,
+    PropertyDefinition,
+    PropertyType,
+    QueryCondition,
+    QueryOperator,
+    QuerySpec,
+    RelationType,
+)
 
 
 class GraphService:
@@ -34,11 +42,91 @@ class GraphService:
         """
         self._context = context
 
-    async def create_entity(self, entity: EntityCreate) -> Dict[str, Any]:
+    async def register_entity_type(self, entity_type: EntityType) -> None:
+        """Register a new entity type.
+
+        Args:
+            entity_type: The entity type definition to register. Properties should be defined using PropertyDefinition
+                        with proper PropertyType values.
+
+        Raises:
+            ValidationError: If entity type definition is invalid
+            TransactionError: If transaction management fails
+        """
+        try:
+            # Validate that properties are using PropertyDefinition with proper PropertyType
+
+            for prop_name, prop_def in entity_type.properties.items():
+                if not isinstance(prop_def, PropertyDefinition):
+                    raise ValidationError(
+                        f"Property {prop_name} must be defined using PropertyDefinition"
+                    )
+                if not isinstance(prop_def.type, PropertyType):
+                    raise ValidationError(
+                        f"Property {prop_name} type must be a PropertyType enum value"
+                    )
+            # Start transaction
+
+            await self._context.begin_transaction()
+            try:
+                await self._context.register_entity_type(entity_type)
+                await self._context.commit_transaction()
+            except Exception as e:
+                if self._context._transaction._in_transaction:
+                    await self._context.rollback_transaction()
+                raise e
+        except ValidationError:
+            raise
+        except Exception as e:
+            raise TransactionError(str(e))
+
+    async def register_relation_type(self, relation_type: RelationType) -> None:
+        """Register a new relation type.
+
+        Args:
+            relation_type: The relation type definition to register. Properties should be defined using PropertyDefinition
+                         with proper PropertyType values.
+
+        Raises:
+            ValidationError: If relation type definition is invalid
+            SchemaError: If referenced entity types don't exist
+            TransactionError: If transaction management fails
+        """
+        try:
+            # Validate that properties are using PropertyDefinition with proper PropertyType
+
+            for prop_name, prop_def in relation_type.properties.items():
+                if not isinstance(prop_def, PropertyDefinition):
+                    raise ValidationError(
+                        f"Property {prop_name} must be defined using PropertyDefinition"
+                    )
+                if not isinstance(prop_def.type, PropertyType):
+                    raise ValidationError(
+                        f"Property {prop_name} type must be a PropertyType enum value"
+                    )
+            # Start transaction
+
+            await self._context.begin_transaction()
+            try:
+                await self._context.register_relation_type(relation_type)
+                await self._context.commit_transaction()
+            except Exception as e:
+                if self._context._transaction._in_transaction:
+                    await self._context.rollback_transaction()
+                raise e
+        except (ValidationError, SchemaError):
+            raise
+        except Exception as e:
+            raise TransactionError(str(e))
+
+    async def create_entity(
+        self, entity_type: str, properties: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Create a new entity.
 
         Args:
-            entity: Entity creation model with type and properties
+            entity_type: Type of the entity to create
+            properties: Entity properties
 
         Returns:
             Dict[str, Any]: Created entity data
@@ -48,15 +136,27 @@ class GraphService:
             TransactionError: If transaction management fails
         """
         try:
+            # Start transaction
+
             await self._context.begin_transaction()
-            entity_id = await self._context.create_entity(
-                entity_type=entity.entity_type, properties=entity.properties
-            )
-            await self._context.commit_transaction()
-            return await self._context.get_entity(entity_id)
+            try:
+                entity_id = await self._context.create_entity(
+                    entity_type=entity_type, properties=properties
+                )
+                entity = await self._context.get_entity(entity_id)
+                await self._context.commit_transaction()
+                return {
+                    "id": entity_id,
+                    "entity_type": entity.type,
+                    "properties": entity.properties,
+                }
+            except Exception as e:
+                await self._context.rollback_transaction()
+                raise e
+        except ValidationError:
+            raise
         except Exception as e:
-            await self._context.rollback_transaction()
-            raise e
+            raise TransactionError(str(e))
 
     async def get_entity(self, entity_id: str) -> Dict[str, Any]:
         """Get an entity by ID.
@@ -70,16 +170,26 @@ class GraphService:
         Raises:
             EntityNotFoundError: If entity doesn't exist
         """
-        return await self._context.get_entity(entity_id)
+        try:
+            entity = await self._context.get_entity(entity_id)
+            return {
+                "id": entity_id,
+                "entity_type": entity.type,
+                "properties": entity.properties,
+            }
+        except EntityNotFoundError:
+            raise
+        except Exception as e:
+            raise EntityNotFoundError(f"Entity {entity_id} not found: {str(e)}")
 
     async def update_entity(
-        self, entity_id: str, entity: EntityUpdate
+        self, entity_id: str, properties: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Update an existing entity.
 
         Args:
             entity_id: ID of the entity to update
-            entity: Entity update model with properties
+            properties: Updated entity properties
 
         Returns:
             Dict[str, Any]: Updated entity data
@@ -90,13 +200,32 @@ class GraphService:
             TransactionError: If transaction management fails
         """
         try:
+            # Check if entity exists first
+
+            try:
+                await self._context.get_entity(entity_id)
+            except EntityNotFoundError:
+                raise EntityNotFoundError(f"Entity {entity_id} not found")
+            # Start transaction
+
             await self._context.begin_transaction()
-            await self._context.update_entity(entity_id, properties=entity.properties)
-            await self._context.commit_transaction()
-            return await self._context.get_entity(entity_id)
+            try:
+                await self._context.update_entity(entity_id, properties=properties)
+                entity = await self._context.get_entity(entity_id)
+                await self._context.commit_transaction()
+                return {
+                    "id": entity_id,
+                    "entity_type": entity.type,
+                    "properties": entity.properties,
+                }
+            except Exception as e:
+                if self._context._transaction._in_transaction:
+                    await self._context.rollback_transaction()
+                raise e
+        except (EntityNotFoundError, ValidationError):
+            raise
         except Exception as e:
-            await self._context.rollback_transaction()
-            raise e
+            raise TransactionError(str(e))
 
     async def delete_entity(self, entity_id: str) -> None:
         """Delete an entity.
@@ -109,18 +238,43 @@ class GraphService:
             TransactionError: If transaction management fails
         """
         try:
-            await self._context.begin_transaction()
-            await self._context.delete_entity(entity_id)
-            await self._context.commit_transaction()
-        except Exception as e:
-            await self._context.rollback_transaction()
-            raise e
+            # Check if entity exists first
 
-    async def create_relation(self, relation: RelationCreate) -> Dict[str, Any]:
+            try:
+                entity = await self._context.get_entity(entity_id)
+                if not entity:
+                    raise EntityNotFoundError(f"Entity {entity_id} not found")
+            except EntityNotFoundError:
+                raise EntityNotFoundError(f"Entity {entity_id} not found")
+            # Start transaction
+
+            await self._context.begin_transaction()
+            try:
+                await self._context.delete_entity(entity_id)
+                await self._context.commit_transaction()
+            except Exception as e:
+                if self._context._transaction._in_transaction:
+                    await self._context.rollback_transaction()
+                raise e
+        except EntityNotFoundError:
+            raise
+        except Exception as e:
+            raise TransactionError(str(e))
+
+    async def create_relation(
+        self,
+        relation_type: str,
+        from_entity: str,
+        to_entity: str,
+        properties: Dict[str, Any],
+    ) -> Dict[str, Any]:
         """Create a new relation.
 
         Args:
-            relation: Relation creation model with type and properties
+            relation_type: Type of the relation to create
+            from_entity: Source entity ID
+            to_entity: Target entity ID
+            properties: Relation properties
 
         Returns:
             Dict[str, Any]: Created relation data
@@ -131,18 +285,32 @@ class GraphService:
             TransactionError: If transaction management fails
         """
         try:
+            # Start transaction
+
             await self._context.begin_transaction()
-            relation_id = await self._context.create_relation(
-                relation_type=relation.relation_type,
-                from_entity=relation.from_entity,
-                to_entity=relation.to_entity,
-                properties=relation.properties,
-            )
-            await self._context.commit_transaction()
-            return await self._context.get_relation(relation_id)
+            try:
+                relation_id = await self._context.create_relation(
+                    relation_type=relation_type,
+                    from_entity=from_entity,
+                    to_entity=to_entity,
+                    properties=properties,
+                )
+                relation = await self._context.get_relation(relation_id)
+                await self._context.commit_transaction()
+                return {
+                    "id": relation_id,
+                    "type": relation.type,
+                    "from_entity": relation.from_entity,
+                    "to_entity": relation.to_entity,
+                    "properties": relation.properties,
+                }
+            except Exception as e:
+                await self._context.rollback_transaction()
+                raise e
+        except (ValidationError, EntityNotFoundError):
+            raise
         except Exception as e:
-            await self._context.rollback_transaction()
-            raise e
+            raise TransactionError(str(e))
 
     async def get_relation(self, relation_id: str) -> Dict[str, Any]:
         """Get a relation by ID.
@@ -156,16 +324,28 @@ class GraphService:
         Raises:
             RelationNotFoundError: If relation doesn't exist
         """
-        return await self._context.get_relation(relation_id)
+        try:
+            relation = await self._context.get_relation(relation_id)
+            return {
+                "id": relation_id,
+                "type": relation.type,
+                "from_entity": relation.from_entity,
+                "to_entity": relation.to_entity,
+                "properties": relation.properties,
+            }
+        except RelationNotFoundError:
+            raise
+        except Exception as e:
+            raise RelationNotFoundError(f"Relation {relation_id} not found: {str(e)}")
 
     async def update_relation(
-        self, relation_id: str, relation: RelationUpdate
+        self, relation_id: str, properties: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Update an existing relation.
 
         Args:
             relation_id: ID of the relation to update
-            relation: Relation update model with properties
+            properties: Updated relation properties
 
         Returns:
             Dict[str, Any]: Updated relation data
@@ -176,15 +356,36 @@ class GraphService:
             TransactionError: If transaction management fails
         """
         try:
+            # Check if relation exists first
+
+            try:
+                relation = await self._context.get_relation(relation_id)
+                if not relation:
+                    raise RelationNotFoundError(f"Relation {relation_id} not found")
+            except RelationNotFoundError:
+                raise RelationNotFoundError(f"Relation {relation_id} not found")
+            # Start transaction
+
             await self._context.begin_transaction()
-            await self._context.update_relation(
-                relation_id, properties=relation.properties
-            )
-            await self._context.commit_transaction()
-            return await self._context.get_relation(relation_id)
+            try:
+                await self._context.update_relation(relation_id, properties=properties)
+                relation = await self._context.get_relation(relation_id)
+                await self._context.commit_transaction()
+                return {
+                    "id": relation_id,
+                    "type": relation.type,
+                    "from_entity": relation.from_entity,
+                    "to_entity": relation.to_entity,
+                    "properties": relation.properties,
+                }
+            except Exception as e:
+                if self._context._transaction._in_transaction:
+                    await self._context.rollback_transaction()
+                raise e
+        except (RelationNotFoundError, ValidationError):
+            raise
         except Exception as e:
-            await self._context.rollback_transaction()
-            raise e
+            raise TransactionError(str(e))
 
     async def delete_relation(self, relation_id: str) -> None:
         """Delete a relation.
@@ -197,27 +398,71 @@ class GraphService:
             TransactionError: If transaction management fails
         """
         try:
-            await self._context.begin_transaction()
-            await self._context.delete_relation(relation_id)
-            await self._context.commit_transaction()
-        except Exception as e:
-            await self._context.rollback_transaction()
-            raise e
+            # Check if relation exists first
 
-    async def query(self, query_spec: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Query relations based on the provided specification.
+            try:
+                relation = await self._context.get_relation(relation_id)
+                if not relation:
+                    raise RelationNotFoundError(f"Relation {relation_id} not found")
+            except RelationNotFoundError:
+                raise RelationNotFoundError(f"Relation {relation_id} not found")
+            # Start transaction
+
+            await self._context.begin_transaction()
+            try:
+                await self._context.delete_relation(relation_id)
+                await self._context.commit_transaction()
+            except Exception as e:
+                if self._context._transaction._in_transaction:
+                    await self._context.rollback_transaction()
+                raise e
+        except RelationNotFoundError:
+            raise
+        except Exception as e:
+            raise TransactionError(str(e))
+
+    async def query(self, query_spec: QuerySpec) -> List[Dict[str, Any]]:
+        """Query entities based on the provided query specification.
 
         Args:
-            query_spec: Query specification with entity_type and conditions
+            query_spec: The query specification containing entity type, conditions, and optional limit/offset.
 
         Returns:
-            List[Dict[str, Any]]: List of matching relations
+            A list of dictionaries containing the matching entities.
 
         Raises:
-            EntityNotFoundError: If referenced entities don't exist
             ValidationError: If query specification is invalid
+            EntityNotFoundError: If entity type does not exist
         """
-        return await self._context.query(query_spec)
+        try:
+            # Convert QuerySpec to dict for the store
+
+            query_dict = query_spec.model_dump()
+
+            # Convert conditions to dicts as well
+
+            if query_dict.get("conditions"):
+                query_dict["conditions"] = [
+                    cond.model_dump() for cond in query_spec.conditions
+                ]
+            try:
+                results = await self._context.query(query_dict)
+                return [
+                    {
+                        "id": result.id,
+                        "type": result.type,
+                        "properties": result.properties,
+                    }
+                    for result in results
+                ]
+            except Exception as e:
+                if self._context._transaction._in_transaction:
+                    await self._context.rollback_transaction()
+                raise e
+        except (ValidationError, EntityNotFoundError):
+            raise
+        except Exception as e:
+            raise ValidationError(f"Invalid query specification: {str(e)}")
 
 
 async def get_graph_service(request: Request) -> GraphService:

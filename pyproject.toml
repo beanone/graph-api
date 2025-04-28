@@ -10,7 +10,8 @@ dependencies = [
     "uvicorn>=0.24.0",
     "pydantic>=2.4.2",
     "graph-context>=0.3.2",
-    "python-dotenv>=1.0.0"
+    "python-dotenv>=1.0.0",
+    "pytest-asyncio>=0.23.0"
 ]
 requires-python = ">=3.10"
 
@@ -34,3 +35,9 @@ known-first-party = ["graph_api"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-v --cov=src/graph_api"
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+    "unit: marks tests as unit tests (deselect with '-m \"not unit\"')",
+    "transaction: marks tests that verify transaction management"
+]
+asyncio_mode = "strict"
