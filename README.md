@@ -76,11 +76,11 @@ Start the API server:
 uvicorn src.graph_api.main:app --reload
 ```
 
-The API will be available at `http://localhost:7000`.
+The API will be available at `http://localhost:8000`.
 
 ### Docker Development
 
-The development container will automatically start with hot-reload enabled. The API will be available at `http://localhost:7000`.
+The development container will automatically start with hot-reload enabled. The API will be available at `http://localhost:8000`.
 
 Development container features:
 - Hot-reload for code changes
@@ -112,7 +112,7 @@ docker-compose down
 ```
 
 Both development and production containers:
-- Expose port 7000
+- Expose port 8000
 - Have health checks configured
 - Use `restart: unless-stopped` policy
 - Set `PYTHONPATH=/app`
@@ -120,8 +120,8 @@ Both development and production containers:
 ## API Documentation
 
 Once the server is running, you can access:
-- Interactive API documentation: `http://localhost:7000/docs`
-- Alternative API documentation: `http://localhost:7000/redoc`
+- Interactive API documentation: `http://localhost:8000/docs`
+- Alternative API documentation: `http://localhost:8000/redoc`
 
 ## API Endpoints
 
@@ -153,7 +153,7 @@ import requests
 
 # Create a person entity
 response = requests.post(
-    "http://localhost:7000/api/v1/entities",
+    "http://localhost:8000/api/v1/entities",
     json={
         "entity_type": "Person",
         "properties": {
@@ -170,7 +170,7 @@ entity_id = response.json()["id"]
 ```python
 # Create a relation between two entities
 response = requests.post(
-    "http://localhost:7000/api/v1/relations",
+    "http://localhost:8000/api/v1/relations",
     json={
         "relation_type": "KNOWS",
         "from_entity": entity_id_1,
@@ -187,7 +187,7 @@ response = requests.post(
 ```python
 # Query all relations from an entity
 response = requests.post(
-    "http://localhost:7000/api/v1/query",
+    "http://localhost:8000/api/v1/query",
     json={
         "start": entity_id,
         "relation": "KNOWS",

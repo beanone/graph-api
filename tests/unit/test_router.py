@@ -704,3 +704,76 @@ async def test_register_relation_type_validation_error(client: TestClient) -> No
     assert response.status_code == 400
     error = response.json()
     assert "message" in error["detail"]
+
+
+@pytest.mark.asyncio
+async def test_has_entity_type_exists(client: TestClient) -> None:
+    """Test checking if an entity type exists."""
+    # First register an entity type
+    entity_type_data = {
+        "name": "Company",
+        "description": "A company entity",
+        "properties": {
+            "name": {"type": "string", "required": True},
+            "founded": {"type": "integer", "required": True},
+        },
+        "indexes": ["name", "founded"],
+    }
+    client.post("/api/v1/entity-types", json=entity_type_data)
+
+    # Check if it exists
+    response = client.get("/api/v1/entity-types/Company")
+    assert response.status_code == 200
+    assert response.json()["message"] == "Entity type Company exists"
+
+
+@pytest.mark.asyncio
+async def test_has_entity_type_not_exists(client: TestClient) -> None:
+    """Test checking if a non-existent entity type exists."""
+    response = client.get("/api/v1/entity-types/NonExistentType")
+    assert response.status_code == 404
+    assert (
+        response.json()["detail"]["message"] == "Entity type NonExistentType not found"
+    )
+
+
+@pytest.mark.asyncio
+async def test_has_relation_type_exists(client: TestClient) -> None:
+    """Test checking if a relation type exists."""
+    # First register required entity types
+    company_type_data = {
+        "name": "Company",
+        "description": "A company entity",
+        "properties": {
+            "name": {"type": "string", "required": True},
+        },
+    }
+    client.post("/api/v1/entity-types", json=company_type_data)
+
+    # Register a relation type
+    relation_type_data = {
+        "name": "WORKS_AT",
+        "description": "A relationship between person and company",
+        "properties": {
+            "role": {"type": "string", "required": True},
+        },
+        "from_types": ["Person"],
+        "to_types": ["Company"],
+    }
+    client.post("/api/v1/relation-types", json=relation_type_data)
+
+    # Check if it exists
+    response = client.get("/api/v1/relation-types/WORKS_AT")
+    assert response.status_code == 200
+    assert response.json()["message"] == "Relation type WORKS_AT exists"
+
+
+@pytest.mark.asyncio
+async def test_has_relation_type_not_exists(client: TestClient) -> None:
+    """Test checking if a non-existent relation type exists."""
+    response = client.get("/api/v1/relation-types/NonExistentType")
+    assert response.status_code == 404
+    assert (
+        response.json()["detail"]["message"]
+        == "Relation type NonExistentType not found"
+    )

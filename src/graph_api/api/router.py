@@ -374,3 +374,53 @@ async def register_relation_type(
         raise handle_transaction_error(e)
     except Exception as e:
         raise handle_validation_error(ValidationError(str(e)))
+
+
+@router.get("/entity-types/{entity_type}")
+async def has_entity_type(
+    entity_type: str, service: GraphService = Depends(get_graph_service)
+) -> Dict[str, Any]:
+    """Check if an entity type exists.
+
+    Args:
+        entity_type: The entity type name to check
+        service: The graph service
+
+    Returns:
+        dict: The existence status
+    """
+    try:
+        exists = await service.has_entity_type(entity_type)
+        if not exists:
+            raise HTTPException(
+                status_code=404,
+                detail={"message": f"Entity type {entity_type} not found"},
+            )
+        return {"message": f"Entity type {entity_type} exists"}
+    except TransactionError as e:
+        raise handle_transaction_error(e)
+
+
+@router.get("/relation-types/{relation_type}")
+async def has_relation_type(
+    relation_type: str, service: GraphService = Depends(get_graph_service)
+) -> Dict[str, Any]:
+    """Check if a relation type exists.
+
+    Args:
+        relation_type: The relation type name to check
+        service: The graph service
+
+    Returns:
+        dict: The existence status
+    """
+    try:
+        exists = await service.has_relation_type(relation_type)
+        if not exists:
+            raise HTTPException(
+                status_code=404,
+                detail={"message": f"Relation type {relation_type} not found"},
+            )
+        return {"message": f"Relation type {relation_type} exists"}
+    except TransactionError as e:
+        raise handle_transaction_error(e)

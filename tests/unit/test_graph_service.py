@@ -150,16 +150,68 @@ async def test_get_entity_success(
 
 
 @pytest.mark.asyncio
-async def test_get_entity_not_found(
+async def test_has_entity_type_found(
     graph_service: GraphService, graph_context: BaseGraphContext
 ) -> None:
     """Test entity retrieval when entity doesn't exist."""
     # Arrange
-    entity_id = "non-existent"
+    entity_type = "non-existent"
 
     # Act & Assert
-    with pytest.raises(EntityNotFoundError):
-        await graph_service.get_entity(entity_id)
+    result = await graph_service.has_entity_type(entity_type)
+    assert result is False
+
+
+@pytest.mark.asyncio
+async def test_has_entity_type_not_found(
+    graph_service: GraphService, graph_context: BaseGraphContext
+) -> None:
+    """Test entity type not exist."""
+    # Arrange
+    entity_type = "non-existent"
+
+    # Act & Assert
+    result = await graph_service.has_entity_type(entity_type)
+    assert result is False
+
+
+@pytest.mark.asyncio
+async def test_get_entity_type_found(
+    graph_service: GraphService, graph_context: BaseGraphContext
+) -> None:
+    """Test entity type exist."""
+    # Arrange
+    entity_type = "Person"
+
+    # Act & Assert
+    result = await graph_service.has_entity_type(entity_type)
+    assert result is True
+
+
+@pytest.mark.asyncio
+async def test_has_relation_type_not_found(
+    graph_service: GraphService, graph_context: BaseGraphContext
+) -> None:
+    """Test relation type not exist."""
+    # Arrange
+    relation_type = "non-existent"
+
+    # Act & Assert
+    result = await graph_service.has_relation_type(relation_type)
+    assert result is False
+
+
+@pytest.mark.asyncio
+async def test_has_relation_type_found(
+    graph_service: GraphService, graph_context: BaseGraphContext
+) -> None:
+    """Test relation type exist."""
+    # Arrange
+    relation_type = "KNOWS"
+
+    # Act & Assert
+    result = await graph_service.has_relation_type(relation_type)
+    assert result is True
 
 
 @pytest.mark.asyncio

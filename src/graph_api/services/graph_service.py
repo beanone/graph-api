@@ -156,6 +156,30 @@ class GraphService:
         except Exception as e:
             raise TransactionError(str(e))
 
+    async def has_entity_type(self, entity_type: str) -> bool:
+        """Check if an entity type exists.
+
+        Args:
+            entity_type: Type of the entity to check
+
+        Returns:
+            bool: True if entity type exists, False otherwise
+        """
+
+        return await self._context.has_entity_type(entity_type)
+
+    async def has_relation_type(self, relation_type: str) -> bool:
+        """Check if a relation type exists.
+
+        Args:
+            relation_type: Type of the relation to check
+
+        Returns:
+            bool: True if entity type exists, False otherwise
+        """
+
+        return await self._context.has_relation_type(relation_type)
+
     async def get_entity(self, entity_id: str) -> Dict[str, Any]:
         """Get an entity by ID.
 

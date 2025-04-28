@@ -19,6 +19,10 @@ COPY pyproject.toml .
 RUN pip install --upgrade pip && \
     pip install fastapi uvicorn pydantic graph-context python-dotenv
 
+# Copy the rest of the application
+COPY . .
+RUN pip install -e .
+
 # Production stage
 FROM python:3.11-slim
 
