@@ -1,0 +1,1307 @@
+{
+	"info": {
+		"_postman_id": "c3cdce3e-1c42-480f-83c2-ad5c80b7372f",
+		"name": "Knowledge Graph API",
+		"description": "API tests for knowledge graph operations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20399655",
+		"_collection_link": "https://lunar-meteor-690428.postman.co/workspace/9a395f38-0999-41d3-870f-80b43c0cd48a/collection/20399655-c3cdce3e-1c42-480f-83c2-ad5c80b7372f?action=share&source=collection_link&creator=20399655"
+	},
+	"item": [
+		{
+			"name": "1. Register Entity Types",
+			"item": [
+				{
+					"name": "Register Person Type",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Registering Person type...');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Accept both 200 and 409 as success (type already exists)",
+									"pm.test('Status code is acceptable', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+									"});",
+									"if (pm.response.code === 200) {",
+									"    pm.test('Entity type is registered successfully', function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData).to.have.property('message');",
+									"        pm.expect(jsonData.message).to.include('Person');",
+									"    });",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Person\", \"description\": \"A person entity\", \"properties\": {\"name\": {\"type\": \"string\", \"required\": true}, \"age\": {\"type\": \"integer\", \"required\": true}, \"occupation\": {\"type\": \"string\", \"required\": false}}, \"indexes\": [\"name\", \"age\"]}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/entity-types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"entity-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Company Type",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Registering Company type...');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Accept both 200 and 409 as success (type already exists)",
+									"pm.test('Status code is acceptable', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+									"});",
+									"if (pm.response.code === 200) {",
+									"    pm.test('Entity type is registered successfully', function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData).to.have.property('message');",
+									"        pm.expect(jsonData.message).to.include('Company');",
+									"    });",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Company\", \"description\": \"A company entity\", \"properties\": {\"name\": {\"type\": \"string\", \"required\": true}, \"founded\": {\"type\": \"integer\", \"required\": true}, \"industry\": {\"type\": \"string\", \"required\": false}}, \"indexes\": [\"name\", \"founded\"]}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/entity-types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"entity-types"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Register Relation Types",
+			"item": [
+				{
+					"name": "Register WORKS_AT Type",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Registering WORKS_AT type...');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Accept both 200 and 409 as success (type already exists)",
+									"pm.test('Status code is acceptable', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+									"});",
+									"if (pm.response.code === 200) {",
+									"    pm.test('Relation type is registered successfully', function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData).to.have.property('message');",
+									"        pm.expect(jsonData.message).to.include('WORKS_AT');",
+									"    });",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"WORKS_AT\", \"description\": \"A relationship between a person and a company\", \"properties\": {\"role\": {\"type\": \"string\", \"required\": true}, \"start_date\": {\"type\": \"integer\", \"required\": true}}, \"indexes\": [\"role\", \"start_date\"], \"from_types\": [\"Person\"], \"to_types\": [\"Company\"]}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/relation-types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"relation-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register KNOWS Type",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Registering KNOWS type...');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Accept both 200 and 409 as success (type already exists)",
+									"pm.test('Status code is acceptable', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 409]);",
+									"});",
+									"if (pm.response.code === 200) {",
+									"    pm.test('Relation type is registered successfully', function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData).to.have.property('message');",
+									"        pm.expect(jsonData.message).to.include('KNOWS');",
+									"    });",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"KNOWS\", \"description\": \"A relationship between two people\", \"properties\": {\"since\": {\"type\": \"integer\", \"required\": true}}, \"indexes\": [\"since\"], \"from_types\": [\"Person\"], \"to_types\": [\"Person\"]}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/relation-types",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"relation-types"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Create Entities",
+			"item": [
+				{
+					"name": "Create Alice",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Creating Alice...');",
+									"// Clear any existing alice_id to ensure we're starting fresh",
+									"pm.environment.unset('alice_id');",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('=== Create Alice Response ===');",
+									"console.log('Status:', pm.response.code);",
+									"console.log('Body:', JSON.stringify(pm.response.json(), null, 2));",
+									"console.log('========================');",
+									"var jsonData = pm.response.json();",
+									"console.log(\"Alice creation response:\", jsonData);",
+									"if (jsonData.id) {",
+									"    pm.globals.set(\"alice_id\", jsonData.id);",
+									"    console.log(\"Set alice_id to:\", jsonData.id);",
+									"} else {",
+									"    console.error(\"Failed to get id from response\");",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"entity_type\": \"Person\", \"properties\": {\"name\": \"Alice Smith\", \"age\": 30, \"occupation\": \"Software Engineer\"}}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/entities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"entities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bob",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Creating Bob...');",
+									"// Clear any existing bob_id to ensure we're starting fresh",
+									"pm.environment.unset('bob_id');"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('=== Create Bob Response ===');",
+									"console.log('Status:', pm.response.code);",
+									"console.log('Body:', JSON.stringify(pm.response.json(), null, 2));",
+									"console.log('========================');",
+									"var jsonData = pm.response.json();",
+									"console.log(\"Bob creation response:\", jsonData);",
+									"if (jsonData.id) {",
+									"    pm.globals.set(\"bob_id\", jsonData.id);",
+									"    console.log(\"Set bob_id to:\", jsonData.id);",
+									"} else {",
+									"    console.error(\"Failed to get id from response\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"entity_type\": \"Person\", \"properties\": {\"name\": \"Bob Johnson\", \"age\": 35, \"occupation\": \"Data Scientist\"}}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/entities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"entities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create TechCorp",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Creating TechCorp...');",
+									"// Clear any existing tech_corp_id to ensure we're starting fresh",
+									"pm.environment.unset('tech_corp_id');",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('=== Create TechCorp Response ===');",
+									"console.log('Status:', pm.response.code);",
+									"console.log('Body:', JSON.stringify(pm.response.json(), null, 2));",
+									"console.log('========================');",
+									"var jsonData = pm.response.json();",
+									"console.log(\"TechCorp creation response:\", jsonData);",
+									"if (jsonData.id) {",
+									"    pm.globals.set(\"tech_corp_id\", jsonData.id);",
+									"    console.log(\"Set tech_corp_id to:\", jsonData.id);",
+									"} else {",
+									"    console.error(\"Failed to get id from response\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"entity_type\": \"Company\", \"properties\": {\"name\": \"TechCorp\", \"founded\": 2010, \"industry\": \"Technology\"}}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/entities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"entities"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Create Relations",
+			"item": [
+				{
+					"name": "Alice Works at TechCorp",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Creating Alice works at TechCorp relation...');",
+									"//var aliceId = pm.environment.get('alice_id');",
+									"var aliceId = pm.globals.get('alice_id');",
+									"//var techCorpId = pm.environment.get('tech_corp_id');",
+									"var techCorpId = pm.globals.get('tech_corp_id');",
+									"console.log('alice_id:', aliceId);",
+									"console.log('tech_corp_id:', techCorpId);",
+									"if (!aliceId) {",
+									"    console.error('alice_id is not set! Please run the Create Alice request first.');",
+									"    return;",
+									"}",
+									"if (!techCorpId) {",
+									"    console.error('tech_corp_id is not set! Please run the Create TechCorp request first.');",
+									"    return;",
+									"}",
+									"// Construct and set the request body with actual values",
+									"var requestBody = {",
+									"    relation_type: \"WORKS_AT\",",
+									"    from_entity: aliceId,",
+									"    to_entity: techCorpId,",
+									"    properties: {",
+									"        role: \"Senior Engineer\",",
+									"        start_date: 2020",
+									"    }",
+									"};",
+									"console.log('Request body:', JSON.stringify(requestBody, null, 2));",
+									"pm.request.body.raw = JSON.stringify(requestBody);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('=== Alice Works at TechCorp Response ===');",
+									"console.log('Status:', pm.response.code);",
+									"console.log('Body:', JSON.stringify(pm.response.json(), null, 2));",
+									"console.log('========================');",
+									"var jsonData = pm.response.json();",
+									"console.log(\"Alice works response:\", jsonData);",
+									"if (jsonData.id) {",
+									"    pm.globals.set(\"alice_works_id\", jsonData.id);",
+									"    console.log(\"Set alice_works_id to:\", jsonData.id);",
+									"} else {",
+									"    console.error(\"Failed to get id from response\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/relations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"relations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bob Works at TechCorp",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Creating Bob works at TechCorp relation...');",
+									"var bobId = pm.globals.get('bob_id');",
+									"var techCorpId = pm.globals.get('tech_corp_id');",
+									"console.log('bob_id:', bobId);",
+									"console.log('tech_corp_id:', techCorpId);",
+									"if (!bobId) {",
+									"    console.error('bob_id is not set! Please run the Create Bob request first.');",
+									"    return;",
+									"}",
+									"if (!techCorpId) {",
+									"    console.error('tech_corp_id is not set! Please run the Create TechCorp request first.');",
+									"    return;",
+									"}",
+									"// Construct and set the request body with actual values",
+									"var requestBody = {",
+									"    relation_type: \"WORKS_AT\",",
+									"    from_entity: bobId,",
+									"    to_entity: techCorpId,",
+									"    properties: {",
+									"        role: \"Lead Data Scientist\",",
+									"        start_date: 2019",
+									"    }",
+									"};",
+									"console.log('Request body:', JSON.stringify(requestBody, null, 2));",
+									"pm.request.body.raw = JSON.stringify(requestBody);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('=== Bob Works at TechCorp Response ===');",
+									"console.log('Status:', pm.response.code);",
+									"console.log('Body:', JSON.stringify(pm.response.json(), null, 2));",
+									"console.log('========================');",
+									"var jsonData = pm.response.json();",
+									"console.log(\"Bob works response:\", jsonData);",
+									"if (jsonData.id) {",
+									"    pm.globals.set(\"bob_works_id\", jsonData.id);",
+									"    console.log(\"Set bob_works_id to:\", jsonData.id);",
+									"} else {",
+									"    console.error(\"Failed to get id from response\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/relations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"relations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alice Knows Bob",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Creating Alice knows Bob relation...');",
+									"var aliceId = pm.globals.get('alice_id');",
+									"var bobId = pm.globals.get('bob_id');",
+									"console.log('alice_id:', aliceId);",
+									"console.log('bob_id:', bobId);",
+									"if (!aliceId) {",
+									"    console.error('alice_id is not set! Please run the Create Alice request first.');",
+									"    return;",
+									"}",
+									"if (!bobId) {",
+									"    console.error('bob_id is not set! Please run the Create Bob request first.');",
+									"    return;",
+									"}",
+									"// Construct and set the request body with actual values",
+									"var requestBody = {",
+									"    relation_type: \"KNOWS\",",
+									"    from_entity: aliceId,",
+									"    to_entity: bobId,",
+									"    properties: {",
+									"        since: 2021",
+									"    }",
+									"};",
+									"console.log('Request body:', JSON.stringify(requestBody, null, 2));",
+									"pm.request.body.raw = JSON.stringify(requestBody);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('=== Alice Knows Bob Response ===');",
+									"console.log('Status:', pm.response.code);",
+									"console.log('Body:', JSON.stringify(pm.response.json(), null, 2));",
+									"console.log('========================');",
+									"var jsonData = pm.response.json();",
+									"console.log(\"Alice knows response:\", jsonData);",
+									"if (jsonData.id) {",
+									"    pm.globals.set(\"alice_knows_id\", jsonData.id);",
+									"    console.log(\"Set alice_knows_id to:\", jsonData.id);",
+									"} else {",
+									"    console.error(\"Failed to get id from response\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/relations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"relations"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Query Operations",
+			"item": [
+				{
+					"name": "Query All People",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Querying all people...');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Response:', pm.response.json());"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"query_spec\": {\"entity_type\": \"Person\", \"conditions\": []}}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/query",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"query"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Query Alice Smith",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Querying Alice Smith...');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log('Response:', pm.response.json());"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"query_spec\": {\"entity_type\": \"Person\", \"conditions\": [{\"field\": \"name\", \"operator\": \"eq\", \"value\": \"Alice Smith\"}]}}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/query",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"query"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Update Operations",
+			"item": [
+				{
+					"name": "Update Alice's Age",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log(\"Updating Alice's age...\");",
+									"var aliceId = pm.globals.get('alice_id');",
+									"console.log('alice_id:', aliceId);",
+									"if (!aliceId) {",
+									"    console.error('alice_id is not set! Please run the Create Alice request first.');",
+									"    return;",
+									"}",
+									"// Set the URL dynamically with the actual ID",
+									"var baseUrl = pm.environment.get('base_url');",
+									"if (!baseUrl) {",
+									"    console.error('base_url is not set!');",
+									"    return;",
+									"}",
+									"var url = baseUrl + '/api/v1/entities/' + aliceId;",
+									"console.log('Request URL:', url);",
+									"pm.request.url = url;"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Verify response is successful",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"// Verify entity is updated with correct properties",
+									"pm.test('Entity is updated with correct properties', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.properties.name).to.equal('Alice Smith');",
+									"    pm.expect(jsonData.properties.age).to.equal(31);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Alice Smith\", \"age\": 31}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/entities/{{alice_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"entities",
+								"{{alice_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Alice's Role",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log(\"Updating Alice's role...\");",
+									"var aliceWorksId = pm.globals.get('alice_works_id');",
+									"console.log('alice_works_id:', aliceWorksId);",
+									"if (!aliceWorksId) {",
+									"    console.error('alice_works_id is not set! Please run the Alice Works at TechCorp request first.');",
+									"    return;",
+									"}",
+									"// Set the URL dynamically with the actual ID",
+									"var baseUrl = pm.environment.get('base_url');",
+									"if (!baseUrl) {",
+									"    console.error('base_url is not set!');",
+									"    return;",
+									"}",
+									"var url = baseUrl + '/api/v1/relations/' + aliceWorksId;",
+									"console.log('Request URL:', url);",
+									"pm.request.url = url;"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Verify response is successful",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"// Verify relation is updated with correct properties",
+									"pm.test('Relation is updated with correct properties', function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.properties.role).to.equal('Principal Engineer');",
+									"    pm.expect(jsonData.properties.start_date).to.equal(2020);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"role\": \"Principal Engineer\", \"start_date\": 2020}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/relations/{{alice_works_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"relations",
+								"{{alice_works_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Delete Operations",
+			"item": [
+				{
+					"name": "Delete Alice Knows Bob Relation",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Deleting Alice knows Bob relation...');",
+									"var aliceKnowsId = pm.globals.get('alice_knows_id');",
+									"console.log('alice_knows_id:', aliceKnowsId);",
+									"if (!aliceKnowsId) {",
+									"    console.error('alice_knows_id is not set! Please run the Alice Knows Bob request first.');",
+									"    return;",
+									"}",
+									"// Set the URL dynamically with the actual ID",
+									"var baseUrl = pm.environment.get('base_url');",
+									"if (!baseUrl) {",
+									"    console.error('base_url is not set!');",
+									"    return;",
+									"}",
+									"var url = baseUrl + '/api/v1/relations/' + aliceKnowsId;",
+									"console.log('Request URL:', url);",
+									"pm.request.url = url;"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Verify response is successful",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/relations/{{alice_knows_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"relations",
+								"{{alice_knows_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Relation Deleted",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Verifying Alice knows Bob relation is deleted...');",
+									"var aliceKnowsId = pm.globals.get('alice_knows_id');",
+									"console.log('alice_knows_id:', aliceKnowsId);",
+									"if (!aliceKnowsId) {",
+									"    console.error('alice_knows_id is not set! Please run the Alice Knows Bob request first.');",
+									"    return;",
+									"}",
+									"// Set the URL dynamically with the actual ID",
+									"var baseUrl = pm.environment.get('base_url');",
+									"if (!baseUrl) {",
+									"    console.error('base_url is not set!');",
+									"    return;",
+									"}",
+									"var url = baseUrl + '/api/v1/relations/' + aliceKnowsId;",
+									"console.log('Request URL:', url);",
+									"pm.request.url = url;"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Verify response is 404 (Not Found)",
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/relations/{{alice_knows_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"relations",
+								"{{alice_knows_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Bob",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Deleting Bob...');",
+									"var bobId = pm.globals.get('bob_id');",
+									"console.log('bob_id:', bobId);",
+									"if (!bobId) {",
+									"    console.error('bob_id is not set! Please run the Create Bob request first.');",
+									"    return;",
+									"}",
+									"// Set the URL dynamically with the actual ID",
+									"var baseUrl = pm.environment.get('base_url');",
+									"if (!baseUrl) {",
+									"    console.error('base_url is not set!');",
+									"    return;",
+									"}",
+									"var url = baseUrl + '/api/v1/entities/' + bobId;",
+									"console.log('Request URL:', url);",
+									"pm.request.url = url;"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Verify response is successful",
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/entities/{{bob_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"entities",
+								"{{bob_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Bob Deleted",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.log('Verifying Bob is deleted...');",
+									"var bobId = pm.globals.get('bob_id');",
+									"console.log('bob_id:', bobId);",
+									"if (!bobId) {",
+									"    console.error('bob_id is not set! Please run the Create Bob request first.');",
+									"    return;",
+									"}",
+									"// Set the URL dynamically with the actual ID",
+									"var baseUrl = pm.environment.get('base_url');",
+									"if (!baseUrl) {",
+									"    console.error('base_url is not set!');",
+									"    return;",
+									"}",
+									"var url = baseUrl + '/api/v1/entities/' + bobId;",
+									"console.log('Request URL:', url);",
+									"pm.request.url = url;"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"console.log('Response:', pm.response.json());",
+									"// Verify response is 404 (Not Found)",
+									"pm.test('Status code is 404', function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/entities/{{bob_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"entities",
+								"{{bob_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Initialize base_url if not set",
+					"if (!pm.environment.get('base_url')) {",
+					"    pm.environment.set('base_url', 'http://127.0.0.1:8000');",
+					"    console.log('Set base_url to:', pm.environment.get('base_url'));",
+					"}",
+					"// Clear any existing entity IDs to ensure clean state",
+					"pm.environment.unset('alice_id');",
+					"pm.environment.unset('bob_id');",
+					"pm.environment.unset('tech_corp_id');",
+					"pm.environment.unset('alice_works_id');",
+					"pm.environment.unset('bob_works_id');",
+					"pm.environment.unset('alice_knows_id');",
+					"console.log('Collection pre-request: Environment variables cleared');",
+					"// Verify environment is clean",
+					"console.log('Environment state after clearing:');",
+					"console.log('alice_id:', pm.environment.get('alice_id'));",
+					"console.log('bob_id:', pm.environment.get('bob_id'));",
+					"console.log('tech_corp_id:', pm.environment.get('tech_corp_id'));",
+					"console.log('alice_works_id:', pm.environment.get('alice_works_id'));",
+					"console.log('bob_works_id:', pm.environment.get('bob_works_id'));",
+					"console.log('alice_knows_id:', pm.environment.get('alice_knows_id'));"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Log current environment state after each request",
+					"console.log('Collection test: Current environment state:');",
+					"console.log('alice_id:', pm.environment.get('alice_id'));",
+					"console.log('bob_id:', pm.environment.get('bob_id'));",
+					"console.log('tech_corp_id:', pm.environment.get('tech_corp_id'));",
+					"console.log('alice_works_id:', pm.environment.get('alice_works_id'));",
+					"console.log('bob_works_id:', pm.environment.get('bob_works_id'));",
+					"console.log('alice_knows_id:', pm.environment.get('alice_knows_id'));"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		},
+		{
+			"key": "alice_id",
+			"value": "e1ff107b-b9e7-4a66-9668-48b50ef4e3df",
+			"type": "string"
+		},
+		{
+			"key": "bob_id",
+			"value": "396ef7b4-b885-4320-b87a-ebb44aa68c8b",
+			"type": "string"
+		},
+		{
+			"key": "tech_corp_id",
+			"value": "0f07827f-4431-453b-b747-e4a352b0ee06",
+			"type": "string"
+		},
+		{
+			"key": "alice_works_id",
+			"value": "13663083-6e19-4b9e-8508-243014bc2a86",
+			"type": "string"
+		},
+		{
+			"key": "bob_works_id",
+			"value": "c7746bae-042b-45a7-befd-7591cc05134a",
+			"type": "string"
+		},
+		{
+			"key": "alice_knows_id",
+			"value": "9327218a-4dc9-48e2-850a-985688fb5895",
+			"type": "string"
+		}
+	]
+}
