@@ -1272,36 +1272,6 @@
 			"key": "base_url",
 			"value": "http://127.0.0.1:8000",
 			"type": "string"
-		},
-		{
-			"key": "alice_id",
-			"value": "e1ff107b-b9e7-4a66-9668-48b50ef4e3df",
-			"type": "string"
-		},
-		{
-			"key": "bob_id",
-			"value": "396ef7b4-b885-4320-b87a-ebb44aa68c8b",
-			"type": "string"
-		},
-		{
-			"key": "tech_corp_id",
-			"value": "0f07827f-4431-453b-b747-e4a352b0ee06",
-			"type": "string"
-		},
-		{
-			"key": "alice_works_id",
-			"value": "13663083-6e19-4b9e-8508-243014bc2a86",
-			"type": "string"
-		},
-		{
-			"key": "bob_works_id",
-			"value": "c7746bae-042b-45a7-befd-7591cc05134a",
-			"type": "string"
-		},
-		{
-			"key": "alice_knows_id",
-			"value": "9327218a-4dc9-48e2-850a-985688fb5895",
-			"type": "string"
 		}
 	]
 }
